@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Tasks</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="refresh">Refresh</string>
+    <string name="error">Error</string>
+    <string name="error_format">[Error] %s</string>
+
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_add">Add Task</string>
+    <string name="title_activity_edit">Edit Task</string>
+
+    <string name="action_add_ok">Add</string>
+    <string name="action_edit_ok">Edit</string>
+    <string name="action_edit_delete">Delete</string>
+    <string name="action_settings">Settings</string>
+
+
+</resources>
