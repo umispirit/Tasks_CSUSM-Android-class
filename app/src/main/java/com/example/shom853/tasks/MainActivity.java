@@ -111,19 +111,31 @@ public class MainActivity extends AppCompatActivity
 		navigationList = (ListView) findViewById(R.id.navigation_drawer_list);
 
 		// get saved data
-		if(savedInstanceState != null){
-			listID = savedInstanceState.getString(TASKLIST_ID);
-			accountEmail = savedInstanceState.getString(ACCOUNT_EMAIL);
-			listIndex = savedInstanceState.getInt(TASKLIST_INDEX);
-		}
-		else{
-			listID = "@default";
-			accountEmail = "android.studio@android.com";
-			listIndex = 0;
-		}
+		SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+		int defaultListIndex = getResources().getInteger(R.integer.saved_listIndex_default);
+		String defaultListID = getResources().getString(R.string.saved_listID_default);
+		String defaultAccountEmail = getResources().getString(R.string.saved_accountEmail_default);
+		listIndex = sharedPref.getInt(getString(R.string.saved_listIndex), defaultListIndex);
+		listID = sharedPref.getString(getString(R.string.saved_listID), defaultListID);
+		accountEmail = sharedPref.getString(getString(R.string.saved_accountEmail), defaultAccountEmail);
+
+//		if(savedInstanceState != null){
+//			listID = savedInstanceState.getString(TASKLIST_ID);
+//			accountEmail = savedInstanceState.getString(ACCOUNT_EMAIL);
+//			listIndex = savedInstanceState.getInt(TASKLIST_INDEX);
+//		}
+//		else{
+//			listID = "@default";
+//			accountEmail = "android.studio@android.com";
+//			listIndex = 0;
+//		}
+
+		// get account email if saved
 		if (credential.getSelectedAccountName() != null) {
 			accountEmail = credential.getSelectedAccountName();
 		}
+
+		// setup navigation drawer
 		navigationHeader = (RelativeLayout) findViewById(R.id.navigation_drawer_header_include);
 		navigationHeader.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -140,12 +152,13 @@ public class MainActivity extends AppCompatActivity
 		email.setText(accountEmail);
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putString(TASKLIST_ID, listID);
-		savedInstanceState.putString(ACCOUNT_EMAIL, accountEmail);
-		savedInstanceState.putInt(TASKLIST_INDEX, listIndex);
-	}
+//	@Override
+//	public void onSaveInstanceState(Bundle savedInstanceState) {
+//		savedInstanceState.putString(TASKLIST_ID, listID);
+//		savedInstanceState.putString(ACCOUNT_EMAIL, accountEmail);
+//		savedInstanceState.putInt(TASKLIST_INDEX, listIndex);
+//	}
+
 	void showGooglePlayServicesAvailabilityErrorDialog(final int connectionStatusCode) {
 		runOnUiThread(new Runnable() {
 			public void run() {
@@ -176,6 +189,19 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	@Override
+	protected void onPause(){
+		super.onPause();
+
+		SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putInt(getString(R.string.saved_listIndex), listIndex);
+		editor.putString(getString(R.string.saved_listID), listID);
+		editor.putString(getString(R.string.saved_accountEmail), accountEmail);
+		editor.commit();
+	}
+
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 
@@ -183,6 +209,7 @@ public class MainActivity extends AppCompatActivity
 			haveGooglePlayServices();
 		}
 	}
+
 
 	/** Check that Google Play services APK is installed and up to date. */
 	private boolean checkGooglePlayServicesAvailable() {
@@ -200,7 +227,7 @@ public class MainActivity extends AppCompatActivity
 			// ask user to choose account
 			chooseAccount();
 		} else {
-			// load tasklists into lists
+			// load tasklists from Google
 			AsyncLoadTaskLists.run(this);
 		}
 	}
